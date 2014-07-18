@@ -31,8 +31,9 @@
 #     $ gov get XXX
 #     instead of
 #     $ go get XXX
-#     when you are any level beneath a well-formed project directory
-# according to Golang directory structure rules, which typically looks like:
+#     when current working direcotry(cwd) is in any level beneath
+# a well-formed project directory according to Golang directory
+# structure rules, which typically looks like:
 #
 #     <project-root>
 #     ├── bin
@@ -44,6 +45,7 @@
 #     └── src
 #           ├── <dirs or files>
 #           ├── ...
+#
 ##################################################
 
 import sys
