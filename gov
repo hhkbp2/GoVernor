@@ -1,0 +1,134 @@
+#!/usr/bin/env python
+# -*- mode: python; coding: utf-8 -*-
+#
+##################################################
+# A command line wrapper for Golang programmers
+# who are tired of setting GOPATH environment variable
+# when using Golang command line tool chain.
+#
+# Copyright (C) 2014 Dylan.Wen
+# Author: Dylan.Wen <hhkbp2@gmail.com>
+# Time-stamp: <2014-07-18 19:34>
+#
+# This file is free software under GPLv3.
+# For a copy of it, see <http://www.gnu.org/licenses/>.
+#
+# Commentary:
+#     The Golang bundled tool chain `go get/build/test...' comes with
+# a nasty GOPATH environment variable, which must be set before using
+# these tool chain in order to locate the project and dependent libraries.
+# It's quite bored to set that variable again and again among projects
+# even I get everything in project local directory. So this wrapper script
+# is written to help.
+#     This script would try to guess the best where is the current project
+# root and what value GOPATH should be if it's not set, and then
+# set GOPATH properly before deliver all command line arguements to
+# the real worker command.
+#
+# Usage:
+#     Put this script on the PATH directory, and use "gov" instead of the
+# bundled Golang command line tool. For example, use
+#     $ gov get XXX
+#     instead of
+#     $ go get XXX
+#     when you are any level beneath a well-formed project directory
+# according to Golang directory structure rules, which typically looks like:
+#
+#     <project-root>
+#     ├── bin
+#     │    ├── <dirs or files>
+#     │    ├── ...
+#     ├── pkg
+#     │    ├── <dirs or files>
+#     │    ├── ...
+#     └── src
+#           ├── <dirs or files>
+#           ├── ...
+##################################################
+
+import sys
+import os
+import os.path
+import subprocess
+
+
+__metaclass__ = type
+
+
+REAL_CMD = 'go'
+GO_PROJECT_DIRS = [
+    "bin",
+    "pkg",
+    "src"]
+GO_PROJECT_SRC_DIR = "src"
+
+
+def every(func, col):
+    for elem in col:
+        if func(elem):
+            continue
+        else:
+            return False
+    return True
+
+def once(func, col):
+    for elem in col:
+        if func(elem):
+            return True
+    return False
+
+
+class NotFoundException(Exception):
+
+    def __init__(self, message):
+        super(NotFoundException, self).__init__(message)
+
+
+def guess_project_root(path):
+    p = os.path.abspath(path)
+    while True:
+        if len(p) == 1:   # path == '/'
+            raise NotFoundException("couldn't find project root dir")
+        if looks_like_project_root(p):
+            return p
+        p = os.path.dirname(p)
+
+
+def looks_like_project_root(path):
+    entries = os.listdir(path)
+    def is_subdir(basename):
+        return ((basename in entries) and
+                os.path.isdir(os.path.join(path, basename)))
+    for i in range(0, len(GO_PROJECT_DIRS) - 1):
+        if every(is_subdir, GO_PROJECT_DIRS[i:]):
+            # Every dir defined in Golang directory structure presents.
+            return True
+    def has_only_src_subdir(basename):
+        return ((basename == GO_PROJECT_SRC_DIR) and
+                os.path.isdir(os.path.join(path, basename)))
+    if once(has_only_src_subdir, entries):
+        # If the dir contains only single subdir "src"
+        return True
+    return False
+
+
+def run():
+    if not os.environ.get('GOPATH'):
+        # guess the value of GOPATH if it's not set
+        cwd = os.getcwd()
+        try:
+            # set GOPATH to the guessed value
+            os.environ['GOPATH'] = guess_project_root(cwd)
+        except NotFoundException as e:
+            # find no proejct root
+            pass
+    # deliver all command line arguements to the real worker tool
+    argv = [REAL_CMD,] + sys.argv[1:]
+    # don't buffer the output of subprocess in PIPE
+    child = subprocess.Popen(argv)
+    child.wait()
+    return child.returncode
+
+if __name__ == '__main__':
+    sys.exit(run())
+
