@@ -10,8 +10,7 @@
 # Author: Dylan.Wen <hhkbp2@gmail.com>
 # Time-stamp: <2014-07-18 19:34>
 #
-# This file is free software under GPLv3.
-# For a copy of it, see <http://www.gnu.org/licenses/>.
+# This file is free software under 3-clause BSD license.
 #
 # Commentary:
 #     The Golang bundled tool chain `go get/build/test...' comes with
