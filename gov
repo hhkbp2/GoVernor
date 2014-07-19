@@ -16,7 +16,7 @@
 # Commentary:
 #     The Golang bundled tool chain `go get/build/test...' comes with
 # a nasty GOPATH environment variable, which must be set before using
-# these tool chain in order to locate the project and dependent libraries.
+# these tools in order to locate the project and dependent libraries.
 # It's quite bored to set that variable again and again among projects
 # even I get everything in project local directory. So this wrapper script
 # is written to help.
@@ -26,7 +26,7 @@
 # the real worker command.
 #
 # Usage:
-#     Put this script on the PATH directory, and use "gov" instead of the
+#     Put this script on a PATH directory, and use "gov" instead of the
 # bundled Golang command line tool. For example, use
 #     $ gov get XXX
 #     instead of
@@ -45,6 +45,9 @@
 #     └── src
 #           ├── <dirs or files>
 #           ├── ...
+#
+#    Or, make a alias for an interactive shell like this:
+#    $ alias go=gov
 #
 ##################################################
 
@@ -124,8 +127,8 @@ def run():
         except NotFoundException as e:
             # find no proejct root
             pass
-    # deliver all command line arguements to the real worker tool
-    argv = [REAL_CMD,] + sys.argv[1:]
+    # deliver all command line arguements to the real worker command
+    argv = ['env', REAL_CMD,] + sys.argv[1:]
     # don't buffer the output of subprocess in PIPE
     child = subprocess.Popen(argv)
     child.wait()
