@@ -127,9 +127,9 @@ def run():
             # find no proejct root
             pass
     # deliver all command line arguements to the real worker command
-    argv = ['env', REAL_CMD,] + sys.argv[1:]
+    args = ['env', REAL_CMD,] + sys.argv[1:]
     # don't buffer the output of subprocess in PIPE
-    child = subprocess.Popen(argv)
+    child = subprocess.Popen(args)
     child.wait()
     return child.returncode
 

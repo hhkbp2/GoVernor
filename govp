@@ -1,0 +1,68 @@
+#!/usr/bin/env python
+# -*- mode: python; coding: utf-8 -*-
+#
+##################################################
+# A helper command for gov to print the guessed GOPATH.
+#
+# Copyright (C) 2014 Dylan.Wen
+# Author: Dylan.Wen <hhkbp2@gmail.com>
+# Time-stamp: <2014-07-18 19:34>
+#
+# This file is free software under 3-clause BSD license.
+#
+# Usage:
+#     To print what GOPATH the gov script found, run this script in shell
+#     $ govp
+#
+##################################################
+
+
+import sys
+import os
+import os.path
+import subprocess
+import re
+
+
+__metaclass__ = type
+
+
+GOV_CMD = 'gov'
+
+
+def run():
+    gopath = os.environ.get("GOPATH")
+    if gopath:
+        print >> sys.stdout, "GOPATH=%s" % (gopath,)
+        return 65
+    args1 = [GOV_CMD, "env"]
+    try:
+        child1 = subprocess.Popen(args1,
+                                  stdout=subprocess.PIPE,
+                                  stderr=subprocess.PIPE)
+        child1.wait()
+    except OSError as e:
+        print >> sys.stderr, e
+        return e.errno
+
+    if child1.returncode != 0:
+        print >> sys.stderr, child1.stderr.read() ,
+        return child1.returncode
+
+    args2 = ["grep", "GOPATH"]
+    child2 = subprocess.Popen(args2,
+                              stdin=child1.stdout,
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE)
+    child2.wait()
+    if child2.returncode != 0:
+        print >> sys.stderr, child2.stderr.read(),
+        return child2.returncode
+
+    output = str.strip(child2.stdout.readline())
+    print >> sys.stdout, output
+    return 0
+
+if __name__ == '__main__':
+    sys.exit(run())
+
