@@ -21,7 +21,6 @@ import sys
 import os
 import os.path
 import subprocess
-import re
 
 
 __metaclass__ = type
@@ -35,6 +34,7 @@ def run():
     if gopath:
         print >> sys.stdout, "GOPATH=%s" % (gopath,)
         return 65
+
     args1 = [GOV_CMD, "env"]
     try:
         child1 = subprocess.Popen(args1,
@@ -44,7 +44,6 @@ def run():
     except OSError as e:
         print >> sys.stderr, e
         return e.errno
-
     if child1.returncode != 0:
         print >> sys.stderr, child1.stderr.read() ,
         return child1.returncode
@@ -58,10 +57,10 @@ def run():
     if child2.returncode != 0:
         print >> sys.stderr, child2.stderr.read(),
         return child2.returncode
-
     output = str.strip(child2.stdout.readline())
     print >> sys.stdout, output
     return 0
+
 
 if __name__ == '__main__':
     sys.exit(run())

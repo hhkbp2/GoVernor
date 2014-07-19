@@ -25,7 +25,7 @@
 # the real worker command.
 #
 # Usage:
-#     Put this script on a PATH directory, and use "gov" instead of the
+#     Put this script on the PATH directory, and use "gov" instead of the
 # bundled Golang command line tool. For example, use
 #     $ gov get XXX
 #     instead of
