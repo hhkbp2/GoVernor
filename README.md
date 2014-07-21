@@ -33,8 +33,8 @@ when current working directory(cwd) is in any level beneath a well-formed projec
     │    ├── <dirs or files>
     │    ├── ...
     └── src
-          ├── <dirs or files>
-          ├── ...
+         ├── <dirs or files>
+         ├── ...
 
 Or, make a alias for an interactive shell like this:
 ```shell
